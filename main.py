@@ -13,7 +13,7 @@ def sleep_task(i: str):
 
 
 @flow
-def sleep_awhile():
+def nested_sleep_awhile():
     logger = get_run_logger()
     logger.info("starting some tasks")
     for i in range(5):
