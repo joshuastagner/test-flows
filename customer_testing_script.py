@@ -7,7 +7,9 @@ import time
 @task
 def trigger(flow_name: str, deployment_name: str, parameters: dict):
     """Triggers a flow deployment."""
-    run_deployment(name=f"{flow_name}/{deployment_name}", parameters=parameters)
+    # Prefect converts underscores to hyphens in flow names
+    flow_name_normalized = flow_name.replace("_", "-")
+    run_deployment(name=f"{flow_name_normalized}/{deployment_name}", parameters=parameters)
     return
 
 
@@ -129,15 +131,15 @@ async def setup(cache: dict):
     deployment_name = cache["deployment_name"]
 
     job_variables = {
-        "image": f"{settings.image_reference}:{settings.image_version}",
         "customizations": '[{"op":"add","path":"/spec/template/spec/containers/0/resources","value":{"requests":{"cpu":"250m","memory":"512Mi"},"limits":{"cpu":"500m","memory":"1Gi"}}}]',
     }
 
     # Deploy nested sub flow
-    nested_sub_flow_deployment_id = await flow.from_source(
+    nested_sub_flow = await flow.from_source(
         source=settings.github_repo,
         entrypoint="customer_testing_script.py:test_nested_sub_flow",
-    ).deploy(
+    )
+    nested_sub_flow_deployment_id = await nested_sub_flow.deploy(
         name=deployment_name,
         work_pool_name=settings.workpool_k8s,
         job_variables=job_variables,
@@ -148,10 +150,11 @@ async def setup(cache: dict):
     print(f"# Created nested sub flow deployment: '{nested_sub_flow_deployment_id}'")
 
     # Deploy sub flow
-    sub_flow_deployment_id = await flow.from_source(
+    sub_flow_obj = await flow.from_source(
         source=settings.github_repo,
         entrypoint="customer_testing_script.py:test_sub_flow",
-    ).deploy(
+    )
+    sub_flow_deployment_id = await sub_flow_obj.deploy(
         name=deployment_name,
         work_pool_name=settings.workpool_k8s,
         job_variables=job_variables,
@@ -162,10 +165,11 @@ async def setup(cache: dict):
     print(f"# Created sub flow deployment: '{sub_flow_deployment_id}'")
 
     # Deploy main flow
-    main_flow_deployment_id = await flow.from_source(
+    main_flow_obj = await flow.from_source(
         source=settings.github_repo,
         entrypoint="customer_testing_script.py:test_main_flow",
-    ).deploy(
+    )
+    main_flow_deployment_id = await main_flow_obj.deploy(
         name=deployment_name,
         work_pool_name=settings.workpool_k8s,
         job_variables=job_variables,

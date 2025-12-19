@@ -11,11 +11,11 @@ class TestSettings(BaseSettings):
     # Kubernetes work pool name
     workpool_k8s: str = "kubernetes-dev-customer-managed"
 
-    # Docker image reference (without tag)
-    image_reference: str = "prefecthq/prefect"
+    # # Docker image reference (without tag)
+    # image_reference: str = "prefecthq/prefect"
 
-    # Docker image version/tag
-    image_version: str = "latest"
+    # # Docker image version/tag
+    # image_version: str = "latest"
 
     # Prefect API URL
     prefect_api_url: str = os.getenv("PREFECT_API_URL", "http://localhost:4200/api")

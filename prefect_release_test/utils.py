@@ -34,7 +34,6 @@ async def check_with_retries(
         except PermanentError:
             raise  # Don't retry permanent errors
         except (AssertionError, Exception) as e:
-            raise
             print('---->', e)
             last_error = e
             if attempt < max_attempts:
