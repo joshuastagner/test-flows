@@ -2,6 +2,7 @@ from prefect import flow, task, get_run_logger
 from prefect.deployments import run_deployment
 from prefect.logging.loggers import flow_run_logger
 import time
+from datetime import datetime, timezone
 
 
 @task
@@ -193,6 +194,9 @@ async def execute(cache: dict):
     - Wait till the four nested sub flowruns enter "Running" state
     - Cancel the main flowrun
     """
+    # Store test start time to filter out old flowruns
+    cache["test_start_time"] = datetime.now(timezone.utc).isoformat()
+
     # load
     client = cache["client"]
     main_flow_deployment_id = cache["main_flow_deployment_id"]
@@ -243,6 +247,7 @@ async def check(cache: dict):
     expected_nested_sub_flowrun_count = cache["expected_nested_sub_flowrun_count"]
     expected_sub_flowrun_count = cache["expected_sub_flowrun_count"]
     expected_main_flowrun_count = cache["expected_main_flowrun_count"]
+    test_start_time = cache["test_start_time"]
 
     async def assert_nested_sub_flowrun():
         async with client:
@@ -255,7 +260,10 @@ async def check(cache: dict):
                                 "deployments": {
                                     "id": {"any_": [nested_sub_flow_deployment_id]}
                                 },
-                                "flow_runs": {"state": {"name": {"any_": [state]}}},
+                                "flow_runs": {
+                                    "state": {"name": {"any_": [state]}},
+                                    "start_time": {"after_": test_start_time},
+                                },
                             }
                         )
                     )
@@ -285,7 +293,10 @@ async def check(cache: dict):
                                 "deployments": {
                                     "id": {"any_": [sub_flow_deployment_id]}
                                 },
-                                "flow_runs": {"state": {"name": {"any_": [state]}}},
+                                "flow_runs": {
+                                    "state": {"name": {"any_": [state]}},
+                                    "start_time": {"after_": test_start_time},
+                                },
                             }
                         )
                     )
@@ -315,7 +326,10 @@ async def check(cache: dict):
                                 "deployments": {
                                     "id": {"any_": [main_flow_deployment_id]}
                                 },
-                                "flow_runs": {"state": {"name": {"any_": [state]}}},
+                                "flow_runs": {
+                                    "state": {"name": {"any_": [state]}},
+                                    "start_time": {"after_": test_start_time},
+                                },
                             }
                         )
                     )
@@ -326,6 +340,7 @@ async def check(cache: dict):
                 states[index]: tasks[index].result() for index in range(len(states))
             }
 
+        print(f"DEBUG main_flow counts: {actual}")
         if actual["Completed"] > 0 or actual["Failed"] > 0 or actual["Crashed"] > 0:
             raise PermanentError(
                 "Detected completed/failed/crashed flowrun, aborting early"
