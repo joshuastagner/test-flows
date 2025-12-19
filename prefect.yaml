@@ -1,0 +1,13 @@
+pull:
+  - prefect.deployments.steps.git_clone:
+      id: clone-step
+      repository: https://github.com/joshuastagner/test-flows.git
+  - prefect.deployments.steps.pip_install_requirements:
+      directory: "{{ clone-step.directory }}"
+      requirements_file: requirements.txt
+
+deployments:
+  - name: nested_sleep_awhile
+    entrypoint: nested_flows.py:parent_sleep_awhile
+    work_pool:
+      name: kubernetes-dev-customer-managed
