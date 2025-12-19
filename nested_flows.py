@@ -20,13 +20,13 @@ def sleep_task(n: int):
     logger.info(f"waking up")
 
 
-@kubernetes(work_pool="kubernetes-dev-customer-managed")
 @flow(on_cancellation=[log_on_cancelled])
 def nested_flow(i: str):
     logger = get_run_logger()
     logger.info(f"starting flow {i}")
     sleep_task(120)
     logger.info(f"finished flow {i}")
+
 
 
 @flow(on_cancellation=[log_on_cancelled])
