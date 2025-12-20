@@ -38,7 +38,11 @@ def test_nested_sub_flow(secs: int = 300):
     """Sleeps for some time."""
     logger = get_run_logger()
     logger.info("Starting nested sub flow...")
-    time.sleep(secs)
+    for i in range(10):
+        rest = int(secs/10)
+        logger.info(f"Sleeping for: {rest} {i}")
+        time.sleep(rest)
+        logger.info(f"waking up after a sleep {i}")
     logger.info("Stopping nested sub flow...")
     return
 
@@ -415,7 +419,7 @@ async def main():
             "settings": settings,
             "client": TestClient(settings),
             "deployment_name": "cancel",
-            "wait_secs": 180,
+            "wait_secs": 300,
         }
 
         print("\n### Setup")
