@@ -34,7 +34,7 @@ def test_nested_sub_flow_cancellation(flow, flow_run, state):
     on_running=[test_nested_sub_flow_running],
     on_cancellation=[test_nested_sub_flow_cancellation],
 )
-def test_nested_sub_flow(secs: int = 60):
+def test_nested_sub_flow(secs: int = 300):
     """Sleeps for some time."""
     logger = get_run_logger()
     logger.info("Starting nested sub flow...")
@@ -54,7 +54,7 @@ def test_sub_flow_cancellation(flow, flow_run, state):
 
 
 @flow(on_running=[test_sub_flow_running], on_cancellation=[test_sub_flow_cancellation])
-def test_sub_flow(deployment_name: str, secs: int = 60):
+def test_sub_flow(deployment_name: str, secs: int = 300):
     """
     Triggers the nested sub flow, in both blocking and non-blocking fashions.
     """
@@ -86,7 +86,7 @@ def test_main_flow_cancellation(flow, flow_run, state):
 @flow(
     on_running=[test_main_flow_running], on_cancellation=[test_main_flow_cancellation]
 )
-def test_main_flow(deployment_name: str, secs: int = 60):
+def test_main_flow(deployment_name: str, secs: int = 300):
     """
     Triggers the sub flow, in both blocking and non-blocking fashions.
     """
