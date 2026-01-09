@@ -316,6 +316,7 @@ async def check(cache: dict):
                 "Detected completed/failed/crashed flowrun, aborting early"
             )
         else:
+            print("ACTUAL--->", actual)
             assert actual["Cancelled"] == expected_sub_flowrun_count
         print("Assertion succeeded")
 

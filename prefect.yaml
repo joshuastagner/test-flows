@@ -10,4 +10,4 @@ deployments:
   - name: nested_sleep_awhile
     entrypoint: nested_flows.py:parent_sleep_awhile
     work_pool:
-      name: kubernetes-dev-customer-managed
+      name: my-ecs-pool

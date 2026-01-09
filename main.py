@@ -2,6 +2,7 @@ from time import sleep
 
 from prefect import flow, task
 from prefect.logging import get_run_logger
+from prefect.docker.docker_image import DockerImage
 
 
 @task
@@ -21,3 +22,18 @@ def nested_sleep_awhile():
     logger.info("Gonna sleep while you break stuff....")
     sleep(120)
     
+
+# if __name__ == "__main__":
+#     nested_sleep_awhile.deploy(
+#         name="bogus-again",
+#         work_pool_name="my-ecs-pool",
+#         # image="bogus:totally",
+#         # image=DockerImage(
+#         #     name="bogus",
+#         #     tag="totally",
+#         #     dockerfile="xDockerfile",
+#         #     pull=False
+#         # ),
+#         push=False,
+#         # build kwarg pull -> False
+#     )

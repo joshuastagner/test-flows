@@ -9,7 +9,7 @@ class TestSettings(BaseSettings):
     github_repo: str = "https://github.com/joshuastagner/test-flows.git"
 
     # Kubernetes work pool name
-    workpool_k8s: str = "kubernetes-dev-customer-managed"
+    workpool_k8s: str = "local"
 
     # # Docker image reference (without tag)
     # image_reference: str = "prefecthq/prefect"
